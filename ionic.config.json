@@ -1,5 +1,7 @@
 {
   "name": "Recipify",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "angular"
 }
