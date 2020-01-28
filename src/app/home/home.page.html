@@ -1,14 +1,22 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>
-      Ionic Blank
+      Recipify
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="ion-padding">
-    The world is your oyster.
-    <p>If you get lost, the <a target="_blank" rel="noopener" href="https://ionicframework.com/docs/">docs</a> will be your guide.</p>
-  </div>
+<ion-content class="ion-padding">
+
+  <ion-item>
+    <ion-label fixed>Value barCode:</ion-label>
+    <ion-input type="text" value="" [(ngModel)]="num"></ion-input>
+  </ion-item>
+
+  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+    <ion-fab-button (click)="scan()">
+      <ion-icon name="barcode"></ion-icon> 
+    </ion-fab-button>
+  </ion-fab>
+  
 </ion-content>
