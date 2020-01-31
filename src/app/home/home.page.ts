@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 import { Storage } from '@ionic/storage';
+import { IonInfiniteScroll } from '@ionic/angular';
 
 
 @Component({
@@ -12,39 +13,83 @@ export class HomePage {
 
   num: string;
   lst_barcode: Array<string>;
+  lst_barcodeToDisplay: Array<string>;
+  index: number;
 
-  constructor(private storage: Storage,private barcodeScanner: BarcodeScanner) {
+  constructor(private storage: Storage, private barcodeScanner: BarcodeScanner) {
     this.lst_barcode = [];
-    this.refresh();
-   }
+    this.lst_barcodeToDisplay = [];
+    this.index = 0;
+    this.loadDataFromStorage();
+  }
 
-  scan(){
+  loadData(event) {
+    setTimeout(() => {
+      console.log('Done');
+      event.target.complete();
+      this.addMoreItems();
+      // App logic to determine if all data is loaded
+      // and disable the infinite scroll
+      if (this.lst_barcodeToDisplay.length == 100) {
+        event.target.disabled = true;
+      }
+    }, 800);
+  }
+
+
+  addMoreItems() {
+    console.log('global list size', this.lst_barcode.length);
+    for (let i = 0; i < 5; ++i) {
+      ++this.index;
+      if (this.lst_barcode[this.index]==null) {
+        --this.index;
+        break;
+      }
+      this.lst_barcodeToDisplay.push(this.lst_barcode[this.index]);
+    }
+  }
+
+
+  //==============Scan===================
+  scan() {
     this.barcodeScanner.scan().then(barcodeData => {
-      this.num = barcodeData.text;
-      this.lst_barcode.push(this.num);
-      this.storage.set("lst_barcode", this.lst_barcode);
+      if (!barcodeData.cancelled) {
+        this.num = barcodeData.text;
+        this.lst_barcode.unshift(this.num);
+        this.lst_barcodeToDisplay.unshift(this.num);
+        ++this.index;
+      }
     }).catch(err => {
-        console.log('Error', err);
+      console.log('Error', err);
     });
   }
 
-  refresh(){
-    // Or to get a key/value pair
+  loadDataFromStorage() {
+
     this.storage.get('lst_barcode').then((val) => {
       this.lst_barcode = val ? val : [];
+      for (let i = 0; i < 10; ++i) {
+        ++this.index;
+        if (this.lst_barcode.length > this.index) {
+          this.lst_barcodeToDisplay.push(this.lst_barcode[this.index]);
+        }
+      }
     });
+
   }
 
-  scantest(){
-      this.num = '844815687';
-      this.lst_barcode.push(this.num);
-      this.storage.set("lst_barcode", this.lst_barcode);
-      console.log(this.lst_barcode);
+  scantest() {
+    this.num = '844815687'+this.index;
+    this.lst_barcode.unshift(this.num);
+    this.lst_barcodeToDisplay.unshift(this.num);
+    ++this.index;
+    console.log(this.num, " added");
   }
-  clear(){
+  clear() {
     this.storage.clear();
     this.lst_barcode = [];
-    console.log(this.lst_barcode);
+    this.lst_barcodeToDisplay = [];
+    console.log("db_clear");
   }
 }
 
