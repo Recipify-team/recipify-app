@@ -1,0 +1,27 @@
+.fwf-button {
+	position: fixed;
+	z-index: 10;
+	bottom: 0;
+	left: 0;
+	box-sizing: border-box;
+	display: block;
+	color: var(--white);
+	background-color: var(--primary);
+	width: calc(100% - 30px);
+	padding: 15px;
+	border-radius: 5px;
+	margin: 15px;
+	box-shadow: 0 5px 20px 0px rgba(#41ea3d, 1);
+	font-family: var(--font-regular);
+	font-size: 1em;
+	outline: none;
+	transition: transform 100ms ease;
+}
+
+.fwf-button>span {
+	text-transform: uppercase;
+}
+
+.fwf-button:active {
+	transform: scale(0.9);
+}

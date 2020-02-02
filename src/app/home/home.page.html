@@ -10,6 +10,16 @@
 
   <p>{{ data }}</p>
 
+  <ion-card >
+    <ion-item>
+      <ion-thumbnail slot="start">
+        <img src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y">
+      </ion-thumbnail>
+      <ion-label>Item Thumbnail</ion-label>
+    </ion-item>
+  </ion-card  >
+  <fwf-button (click)="scantest()"></fwf-button>
+
   <ion-item>
     <ion-label fixed>Value barCode:</ion-label>
     <ion-input type="text" value="" [(ngModel)]="num"></ion-input>
@@ -17,7 +27,7 @@
 
 
 
-  <ion-list>
+  <!-- <ion-list>
     <ion-item *ngFor="let item of lst_barcodeToDisplay">
       <ion-label>{{item}}</ion-label>
     </ion-item>
@@ -27,22 +37,22 @@
     <ion-infinite-scroll-content class="ispinner"
       loadingSpinner="crescent" >
     </ion-infinite-scroll-content>
-  </ion-infinite-scroll>
+  </ion-infinite-scroll> -->
 
 
 
   <!-- fab to scan a product -->
-  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+  <!-- <ion-fab vertical="bottom" horizontal="center" slot="fixed">
     <ion-fab-button (click)="scantest()">
-      <ion-icon name="barcode"></ion-icon> 
+      <ion-icon name="barcode"></ion-icon>
     </ion-fab-button>
-  </ion-fab>
+  </ion-fab> -->
 
   <!-- fab for clear the product list -->
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <!-- <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="clear()">
-      <ion-icon name="trash"></ion-icon> 
+      <ion-icon name="trash"></ion-icon>
     </ion-fab-button>
-  </ion-fab>
+  </ion-fab> -->
 
 </ion-content>
