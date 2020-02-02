@@ -11,7 +11,8 @@ import { IonicStorageModule } from '@ionic/storage';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-
+import { HTTP } from '@ionic-native/http/ngx';
+//import { HttpClientModule } from '@angular/common/http';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -21,6 +22,7 @@ import { AppRoutingModule } from './app-routing.module';
     BarcodeScanner,
     SplashScreen,
     ScreenOrientation,
+    HTTP,
 
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],

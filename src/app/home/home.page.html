@@ -8,6 +8,8 @@
 
 <ion-content class="ion-padding">
 
+  <p>{{ data }}</p>
+
   <ion-item>
     <ion-label fixed>Value barCode:</ion-label>
     <ion-input type="text" value="" [(ngModel)]="num"></ion-input>
@@ -31,7 +33,7 @@
 
   <!-- fab to scan a product -->
   <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-    <ion-fab-button (click)="scan()">
+    <ion-fab-button (click)="scantest()">
       <ion-icon name="barcode"></ion-icon> 
     </ion-fab-button>
   </ion-fab>
