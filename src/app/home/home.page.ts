@@ -10,7 +10,7 @@ import { HTTP } from '@ionic-native/http/ngx';
 
 import { finalize } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { Observable, from } from 'rxjs';
+import { from } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -20,14 +20,14 @@ import { Observable, from } from 'rxjs';
 export class HomePage {
 
   num: string;
-  lst_barcode: Array<string>;
-  lst_barcodeToDisplay: Array<string>;
+  products: Array<Object>;
+  productsToDisplay: Array<Object>;
   index: number;
   result: string;
 
-  constructor(private storage: Storage, private barcodeScanner: BarcodeScanner, private recipeService: RecipeService, private http: HttpClient, private nativeHttp: HTTP, private plt: Platform) {
-    this.lst_barcode = [];
-    this.lst_barcodeToDisplay = [];
+  constructor(private storage: Storage, private barcodeScanner: BarcodeScanner, private recipeService: RecipeService) {
+    this.products = [];
+    this.productsToDisplay = [];
     this.index = 0;
     this.loadDataFromStorage();
   }
@@ -39,7 +39,7 @@ export class HomePage {
       this.addMoreItems();
       // App logic to determine if all data is loaded
       // and disable the infinite scroll
-      if (this.lst_barcodeToDisplay.length == 100) {
+      if (this.productsToDisplay.length == 100) {
         event.target.disabled = true;
       }
     }, 800);
@@ -47,14 +47,14 @@ export class HomePage {
 
 
   addMoreItems() {
-    console.log('global list size', this.lst_barcode.length);
+    console.log('global list size', this.products.length);
     for (let i = 0; i < 5; ++i) {
       ++this.index;
-      if (this.lst_barcode[this.index] == null) {
+      if (this.products[this.index] == null) {
         --this.index;
         break;
       }
-      this.lst_barcodeToDisplay.push(this.lst_barcode[this.index]);
+      this.productsToDisplay.push(this.products[this.index]);
     }
   }
 
@@ -64,34 +64,34 @@ export class HomePage {
 
     this.barcodeScanner.scan().then(barcodeData => {
       if (!barcodeData.cancelled) {
-        from(this.recipeService.getDataNativeHttp(barcodeData.text)).pipe(
-          finalize(() => console.log("testInsidePipe"))
-        ).subscribe(data => {
-          console.log('native data' + JSON.stringify(data.data));
+        from(this.recipeService.getDataNativeHttp(barcodeData.text)).pipe().subscribe(data => {
           this.num = JSON.parse(data.data);
-          this.lst_barcode.unshift(JSON.parse(data.data));
-          this.lst_barcodeToDisplay.unshift(JSON.parse(data.data));
+          this.products.unshift(JSON.parse(data.data));
+          this.productsToDisplay.unshift(JSON.parse(data.data));
           ++this.index;
+          this.storage.set('products',this.products );
         }, err => {
           console.log('JS Call error' + err);
         })
       }
     }).catch(err => {
-      console.log('Error', err);
+      console.log('Scanner Error', err);
     });
 
   }
 
   loadDataFromStorage() {
-    this.storage.get('lst_barcode').then((val) => {
-      this.lst_barcode = val ? val : [];
-      for (let i = 0; i < 10; ++i) {
+    this.storage.get('products').then((val) => {
+      this.products = val ? val : [];
+      for (let i = 0; i < 5; ++i) {
         ++this.index;
-        if (this.lst_barcode.length > this.index) {
-          this.lst_barcodeToDisplay.push(this.lst_barcode[this.index]);
+        if (this.products.length > this.index) {
+          this.productsToDisplay.push(this.products[this.index]);
         }
       }
+      console.log(this.products)
     });
+    
   }
 
   scantest() {
@@ -100,8 +100,8 @@ export class HomePage {
     ).subscribe(data => {
       console.log('native data' + JSON.stringify(data.data));
       this.num = JSON.parse(data.data);
-      this.lst_barcode.unshift(JSON.parse(data.data));
-      this.lst_barcodeToDisplay.unshift(JSON.parse(data.data));
+      this.products.unshift(JSON.parse(data.data));
+      this.productsToDisplay.unshift(JSON.parse(data.data));
       ++this.index;
     }, err => {
       console.log('JS Call error' + err);
@@ -109,9 +109,9 @@ export class HomePage {
   }
 
   clear() {
+    this.products = [];
+    this.productsToDisplay = [];
     this.storage.clear();
-    this.lst_barcode = [];
-    this.lst_barcodeToDisplay = [];
     console.log("db_clear");
   }
 }
