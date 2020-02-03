@@ -10,34 +10,45 @@
 
   <p>{{ data }}</p>
 
-  <ion-card >
-    <ion-item>
-      <ion-thumbnail slot="start">
-        <img src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y">
-      </ion-thumbnail>
-      <ion-label>Item Thumbnail</ion-label>
-    </ion-item>
-  </ion-card  >
   <fwf-button (click)="scantest()"></fwf-button>
-
+  <!-- 
   <ion-item>
     <ion-label fixed>Value barCode:</ion-label>
     <ion-input type="text" value="" [(ngModel)]="num"></ion-input>
-  </ion-item>
+  </ion-item> -->
 
+  <header>
+  <h2 class="header-title">Scan history</h2>
+  <ul class="header-actions">
+    <li><ion-icon size="large" name="md-trash"></ion-icon></li>
+  </ul>
+  </header>
+  <hr>
+  
 
+  <div class="product-card-list">
+
+    <div class="product-card" *ngFor="let item of lst_barcodeToDisplay"> 
+      <img src="https://static.openfoodfacts.org/images/products/006/131/400/0070/front_fr.3.400.jpg" alt="">
+      <div class="product-card-body">
+        <h3 class="product-card-title">Test Product</h3>
+        <span class="product-card-id">{{item}}</span>
+      </div>
+    </div>
+
+  </div>
 
   <!-- <ion-list>
     <ion-item *ngFor="let item of lst_barcodeToDisplay">
       <ion-label>{{item}}</ion-label>
     </ion-item>
-  </ion-list>
+  </ion-list> -->
 
   <ion-infinite-scroll  threshold="100px" (ionInfinite)="loadData($event)">
     <ion-infinite-scroll-content class="ispinner"
       loadingSpinner="crescent" >
     </ion-infinite-scroll-content>
-  </ion-infinite-scroll> -->
+  </ion-infinite-scroll>
 
 
 
