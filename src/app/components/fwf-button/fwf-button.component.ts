@@ -7,14 +7,14 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 })
 export class FwfButtonComponent implements OnInit {
 
-  @Output() click : EventEmitter<any> = new EventEmitter();
+  @Output() clicked : EventEmitter<any> = new EventEmitter();
 
   constructor() { }
 
   ngOnInit() {}
 
   onClick() {
-    this.click.emit();
+    this.clicked.emit();
   }
 
 }
