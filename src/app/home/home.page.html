@@ -10,7 +10,7 @@
 
   <p>{{ data }}</p>
 
-  <fwf-button (clicked)="scantest()"></fwf-button>
+  <fwf-button (clicked)="scan()"></fwf-button>
   <!-- 
   <ion-item>
     <ion-label fixed>Value barCode:</ion-label>
@@ -20,7 +20,7 @@
   <header>
   <h2 class="header-title">Scan history</h2>
   <ul class="header-actions">
-    <li><ion-icon size="large" name="md-trash"></ion-icon></li>
+    <li (click)="clear()"><ion-icon size="large" name="md-trash"></ion-icon></li>
   </ul>
   </header>
   <hr>
@@ -29,41 +29,20 @@
   <div class="product-card-list">
 
     <div class="product-card" *ngFor="let item of lst_barcodeToDisplay"> 
-      <img src="https://static.openfoodfacts.org/images/products/006/131/400/0070/front_fr.3.400.jpg" alt="">
+      <img src="{{ item.data.image }}" alt="">
       <div class="product-card-body">
-        <h3 class="product-card-title">Test Product</h3>
-        <span class="product-card-id">{{item}}</span>
+        <h3 class="product-card-title">{{ item.data.name }}</h3>
+        <span class="product-card-id">{{ item.data.id }}</span>
       </div>
     </div>
 
   </div>
 
-  <!-- <ion-list>
-    <ion-item *ngFor="let item of lst_barcodeToDisplay">
-      <ion-label>{{item}}</ion-label>
-    </ion-item>
-  </ion-list> -->
 
   <ion-infinite-scroll  threshold="100px" (ionInfinite)="loadData($event)">
     <ion-infinite-scroll-content class="ispinner"
       loadingSpinner="crescent" >
     </ion-infinite-scroll-content>
   </ion-infinite-scroll>
-
-
-
-  <!-- fab to scan a product -->
-  <!-- <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-    <ion-fab-button (click)="scantest()">
-      <ion-icon name="barcode"></ion-icon>
-    </ion-fab-button>
-  </ion-fab> -->
-
-  <!-- fab for clear the product list -->
-  <!-- <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="clear()">
-      <ion-icon name="trash"></ion-icon>
-    </ion-fab-button>
-  </ion-fab> -->
 
 </ion-content>

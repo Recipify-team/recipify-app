@@ -3,8 +3,14 @@ import { Component, ViewChild } from '@angular/core';
 import { RecipeService } from './../api/recipe.service';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 import { Storage } from '@ionic/storage';
-import { HttpClient } from '@angular/common/http';
 
+
+import { Platform } from '@ionic/angular';
+import { HTTP } from '@ionic-native/http/ngx';
+
+import { finalize } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable, from } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -17,9 +23,9 @@ export class HomePage {
   lst_barcode: Array<string>;
   lst_barcodeToDisplay: Array<string>;
   index: number;
-  data: string;
+  result: string;
 
-  constructor(private storage: Storage, private barcodeScanner: BarcodeScanner, private recipeService: RecipeService) {
+  constructor(private storage: Storage, private barcodeScanner: BarcodeScanner, private recipeService: RecipeService, private http: HttpClient, private nativeHttp: HTTP, private plt: Platform) {
     this.lst_barcode = [];
     this.lst_barcodeToDisplay = [];
     this.index = 0;
@@ -40,7 +46,6 @@ export class HomePage {
   }
 
 
-
   addMoreItems() {
     console.log('global list size', this.lst_barcode.length);
     for (let i = 0; i < 5; ++i) {
@@ -59,11 +64,17 @@ export class HomePage {
 
     this.barcodeScanner.scan().then(barcodeData => {
       if (!barcodeData.cancelled) {
-        this.num = barcodeData.text;
-
-        this.lst_barcode.unshift(this.num);
-        this.lst_barcodeToDisplay.unshift(this.num);
-        ++this.index;
+        from(this.recipeService.getDataNativeHttp(barcodeData.text)).pipe(
+          finalize(() => console.log("testInsidePipe"))
+        ).subscribe(data => {
+          console.log('native data' + JSON.stringify(data.data));
+          this.num = JSON.parse(data.data);
+          this.lst_barcode.unshift(JSON.parse(data.data));
+          this.lst_barcodeToDisplay.unshift(JSON.parse(data.data));
+          ++this.index;
+        }, err => {
+          console.log('JS Call error' + err);
+        })
       }
     }).catch(err => {
       console.log('Error', err);
@@ -83,27 +94,20 @@ export class HomePage {
     });
   }
 
-
   scantest() {
-    this.num = '844815687' + this.index;
-    this.recipeService.getData(743434009477);
-
-    this.recipeService.result.subscribe( (data) => 
-    {
-    this.data = data.results;
-    // this.dataLoaded = true;
-    console.log(data.results)
-  
-    }
-    );
-    
-    console.log("data DEBUGCUSTOM",this.data);
-
-    this.lst_barcode.unshift(this.num);
-    this.lst_barcodeToDisplay.unshift(this.num);
-    ++this.index;
-    console.log(this.num+ " added");
+    from(this.recipeService.getDataNativeHttp('061314000070')).pipe(
+      finalize(() => console.log("testInsidePipe"))
+    ).subscribe(data => {
+      console.log('native data' + JSON.stringify(data.data));
+      this.num = JSON.parse(data.data);
+      this.lst_barcode.unshift(JSON.parse(data.data));
+      this.lst_barcodeToDisplay.unshift(JSON.parse(data.data));
+      ++this.index;
+    }, err => {
+      console.log('JS Call error' + err);
+    })
   }
+
   clear() {
     this.storage.clear();
     this.lst_barcode = [];

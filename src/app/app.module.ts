@@ -11,21 +11,20 @@ import { IonicStorageModule } from '@ionic/storage';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { HTTP } from '@ionic-native/http/ngx';
-//import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
+import {HTTP} from '@ionic-native/http/ngx'
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, IonicModule.forRoot(),IonicStorageModule.forRoot(), AppRoutingModule],
+  imports: [BrowserModule, IonicModule.forRoot(), IonicStorageModule.forRoot(), AppRoutingModule, HttpClientModule],
   providers: [
     StatusBar,
     BarcodeScanner,
     SplashScreen,
     ScreenOrientation,
-    HTTP,
-
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    HTTP  
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

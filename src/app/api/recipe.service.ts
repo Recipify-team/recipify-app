@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+import { Observable, from } from 'rxjs';
+import { Platform } from '@ionic/angular';
 import { HTTP } from '@ionic-native/http/ngx';
 
-import { Observable } from 'rxjs';
-
-
+import { finalize } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +13,11 @@ import { Observable } from 'rxjs';
 export class RecipeService {
 
   url = 'http://165.227.49.166:3000/product/';
-  public result : Observable<any> = new Observable<any>();
-  constructor(private http: HTTP) { }
+  data:string;
+  // public product = new Observable<any>();
+  constructor(private http: HttpClient, private nativeHttp: HTTP, private plt: Platform) { }
+
+  // public product = new Observable<any>();
 
   /**
   * Get the detailed information for an ID using the "i" parameter
@@ -20,25 +25,29 @@ export class RecipeService {
   * @param {string} barcode imdbID to retrieve information
   * @returns Observable with detailed information
   */
-  async getData(barcode) {
-    try {
-      const url = this.url + barcode;
-      const params = {};
-      const headers = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT', 'Accept': 'application/json', 'content-type': 'application/json' };
+  async getDataStandars(barcode) {
+    const url = this.url + barcode;
 
-      const result = await this.http.get(url, params, headers);
+    this.http.get(url).pipe(
+      finalize(() => console.log("testInsidePipe"))
+    )
+      .subscribe(data => {
+        this.data = data['result'];
+      }, err => {
+        console.log('JS Call error' + err);
+      })
+  }
 
-      console.log(result.status);
-      console.log("RECIPE RESULST" + JSON.stringify(result.data)); // JSON data returned by server
-      console.log(result.headers);
+  async getDataNativeHttp(barcode) {
+    const url = this.url + barcode;
 
-
-    } catch (error) {
-      console.error(error.status);
-      console.error(error.error); // Error message as string
-      console.error(error.headers);
-    }
-
+    let nativeCall = this.nativeHttp.get(url, {}, {
+      'Content-Type': 'application/json'
+    });
+    return nativeCall;
+  }
+  getDataEverywhere(barcode) {
+    this.plt.is('cordova') ? this.getDataNativeHttp(barcode) : this.getDataStandars(barcode);
   }
 
 }
