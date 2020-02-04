@@ -1,0 +1,32 @@
+.product-image {
+	width: 100%;
+	height: 500px;
+	object-fit: cover;
+	margin-bottom: -200px;
+	position: relative;
+}
+
+.product-container {
+	position: relative;
+	background-color: var(--white);
+	border-radius: 5px;
+	box-shadow: 0 10px 30px -5px rgba(#000000, 0.2);
+	display: flex;
+	padding: 15px;
+	margin: 15px 0;
+	align-items: center;
+	transition: transform 100ms ease;
+	// border: 1px solid black;
+
+	&:active {
+		transform: scale(0.9);
+	}
+
+	img {
+		display: block;
+		width: 60px;
+		height: 60px;
+		object-fit: cover;
+		border-radius: 5px;
+	}
+}
