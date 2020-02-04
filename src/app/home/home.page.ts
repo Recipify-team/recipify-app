@@ -11,6 +11,7 @@ import { HTTP } from '@ionic-native/http/ngx';
 import { finalize } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { from } from 'rxjs';
+import { NavigationExtras, ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -25,7 +26,7 @@ export class HomePage {
   index: number;
   result: string;
 
-  constructor(private storage: Storage, private barcodeScanner: BarcodeScanner, private recipeService: RecipeService) {
+  constructor(private storage: Storage, private barcodeScanner: BarcodeScanner, private recipeService: RecipeService,private route:ActivatedRoute,private router: Router) {
     this.products = [];
     this.productsToDisplay = [];
     this.index = 0;
@@ -58,18 +59,35 @@ export class HomePage {
     }
   }
 
+  openDetailsWithState(product){
+    let navigationExtras:NavigationExtras = {
+      state:{
+        product:product
+      }
+    }
+    this.router.navigate(['product'],navigationExtras);
+  }
+
 
   //==============Scan===================
   scan() {
-
     this.barcodeScanner.scan().then(barcodeData => {
       if (!barcodeData.cancelled) {
         from(this.recipeService.getDataNativeHttp(barcodeData.text)).pipe().subscribe(data => {
-          this.num = JSON.parse(data.data);
-          this.products.unshift(JSON.parse(data.data));
-          this.productsToDisplay.unshift(JSON.parse(data.data));
+          let product = JSON.parse(data.data).data;
+          this.products.unshift(product);
+          this.productsToDisplay.unshift(product);
           ++this.index;
           this.storage.set('products',this.products );
+
+          // Redirect
+          let navigationExtras:NavigationExtras = {
+            state:{
+              product:product
+            }
+          }
+          this.router.navigate(['product'],navigationExtras);
+
         }, err => {
           console.log('JS Call error' + err);
         })
@@ -77,7 +95,6 @@ export class HomePage {
     }).catch(err => {
       console.log('Scanner Error', err);
     });
-
   }
 
   loadDataFromStorage() {
@@ -95,17 +112,21 @@ export class HomePage {
   }
 
   scantest() {
-    from(this.recipeService.getDataNativeHttp('061314000070')).pipe(
-      finalize(() => console.log("testInsidePipe"))
-    ).subscribe(data => {
-      console.log('native data' + JSON.stringify(data.data));
-      this.num = JSON.parse(data.data);
-      this.products.unshift(JSON.parse(data.data));
-      this.productsToDisplay.unshift(JSON.parse(data.data));
+    // from(this.recipeService.getDataNativeHttp('061314000070')).pipe(
+    //   finalize(() => console.log("testInsidePipe"))
+    // ).subscribe(data => {
+    //   console.log('native data' + JSON.stringify(data.data));
+    //   this.num = JSON.parse(data.data);
+    //   this.products.unshift(JSON.parse(data.data));
+    //   this.productsToDisplay.unshift(JSON.parse(data.data));
+    //   ++this.index;
+    // }, err => {
+    //   console.log('JS Call error' + err);
+    // })
+    this.num = '565464';
+      this.products.unshift(this.num);
+      this.productsToDisplay.unshift(this.num);
       ++this.index;
-    }, err => {
-      console.log('JS Call error' + err);
-    })
   }
 
   clear() {
