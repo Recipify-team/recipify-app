@@ -32,3 +32,46 @@
 ion-spinner {
     color: #64eb25;
 }
+
+.section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	overflow: hidden;
+
+	.header-title {
+		margin: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		word-break: break-all;
+		color: var(--dark);
+	}
+
+	.header-actions {
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
+
+		li {
+			display: flex;
+			align-items: center;
+			color: var(--white);
+			background-color: var(--primary);
+			padding: 10px;
+			border-radius: 5px;
+			box-shadow: 0 5px 10px 0px rgba(#41ea3d, 0.5);
+			transition: transform 100ms ease;
+
+			&:active {
+				transform: scale(0.9);
+			}
+		}
+	}
+}
+
+hr {
+	height: 1px;
+	background-color: var(--dark);
+	opacity: 0.2;
+}

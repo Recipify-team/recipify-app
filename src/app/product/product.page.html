@@ -4,11 +4,55 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<!-- <ion-content>
   <img class="product-image" src="{{data.image}}" alt="">
   <div class="ion-padding">
     <div class="product-container">
       <h2>{{data.name}}</h2>
+    </div>
+  </div>
+</ion-content> -->
+
+<ion-content>
+  <img class="product-image" src="{{data.image}}" alt="">
+  <div class="ion-padding">
+    <div class="product-container">
+      <header>
+        <span class="product-code">{{data.id}}</span>
+        <h2 class="product-name">{{data.name}}</h2>
+        <span class="product-brand">{{data.brand}}</span>
+      </header>
+      <main>
+        <br>
+        <div class="section-header">
+          <h3 class="header-title">Recipes</h3>
+        </div>
+        <hr>
+        <div class="recipe-card-list">
+
+          <div class="recipe-card">
+            <img src="https://static.openfoodfacts.org/images/products/006/131/400/0070/front_fr.3.400.jpg" alt="">
+            <div class="recipe-card-body">
+              <h3 class="recipe-card-title">Recipe test</h3>
+            </div>
+          </div>
+
+          <div class="recipe-card">
+            <img src="https://static.openfoodfacts.org/images/products/006/131/400/0070/front_fr.3.400.jpg" alt="">
+            <div class="recipe-card-body">
+              <h3 class="recipe-card-title">Recipe test</h3>
+            </div>
+          </div>
+
+          <div class="recipe-card">
+            <img src="https://static.openfoodfacts.org/images/products/006/131/400/0070/front_fr.3.400.jpg" alt="">
+            <div class="recipe-card-body">
+              <h3 class="recipe-card-title">Recipe test</h3>
+            </div>
+          </div>
+
+        </div>
+      </main>
     </div>
   </div>
 </ion-content>
