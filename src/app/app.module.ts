@@ -10,9 +10,12 @@ import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 import { IonicStorageModule } from '@ionic/storage';
 
 import { AppComponent } from './app.component';
+
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClientModule } from '@angular/common/http';
-import {HTTP} from '@ionic-native/http/ngx'
+import { HTTP } from '@ionic-native/http/ngx';
+import { HttpRequestInterceptor } from './interceptor/http-loading.interceptor';
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -23,7 +26,12 @@ import {HTTP} from '@ionic-native/http/ngx'
     SplashScreen,
     ScreenOrientation,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    HTTP  
+    HTTP,
+    // {
+    //   provide: HTTP_INTERCEPTORS,
+    //   useClass: HttpRequestInterceptor,
+    //   multi: true
+    // }
   ],
   bootstrap: [AppComponent]
 })

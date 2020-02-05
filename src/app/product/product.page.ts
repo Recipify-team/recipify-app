@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
 
 @Component({
 	selector: 'app-product',
@@ -15,6 +15,15 @@ export class ProductPage implements OnInit {
 	 }
 
 	ngOnInit() {
+	}
+
+	openRecipeWithState(recipe) {
+		let navigationExtras: NavigationExtras = {
+			state: {
+				recipe: recipe
+			}
+		}
+		this.router.navigate(['recipe'], navigationExtras);
 	}
 
 }
