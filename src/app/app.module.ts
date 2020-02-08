@@ -7,32 +7,50 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
-import { IonicStorageModule } from '@ionic/storage';
+
+import { Storage, IonicStorageModule } from '@ionic/storage';
 
 import { AppComponent } from './app.component';
 
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP } from '@ionic-native/http/ngx';
-import { HttpRequestInterceptor } from './interceptor/http-loading.interceptor';
+
+import { JwtModule, JWT_OPTIONS } from '@auth0/angular-jwt'
+import{AuthGuardService}from './services/auth-guard.service'
+
+export function jwtOptionsFactory(storage) {
+  return {
+    tokenGetter: () => {
+      return storage.get('access_token');
+    },
+    whitelistedDomains: ['localhost:8100']
+  }
+}
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, IonicModule.forRoot(), IonicStorageModule.forRoot(), AppRoutingModule, HttpClientModule],
+  imports: [BrowserModule, IonicModule.forRoot(), IonicStorageModule.forRoot(),
+    AppRoutingModule, HttpClientModule,
+    JwtModule.forRoot({
+      jwtOptionsProvider: {
+        provide: JWT_OPTIONS,
+        useFactory: jwtOptionsFactory,
+        deps: [Storage],
+      }
+    })],
   providers: [
+    AuthGuardService,
     StatusBar,
     BarcodeScanner,
     SplashScreen,
     ScreenOrientation,
+
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     HTTP,
-    // {
-    //   provide: HTTP_INTERCEPTORS,
-    //   useClass: HttpRequestInterceptor,
-    //   multi: true
-    // }
   ],
   bootstrap: [AppComponent]
 })
+
 export class AppModule { }

@@ -1,3 +1,5 @@
 export const environment = {
-  production: true
+  production: true,
+  // A CHANGER
+  url:'http://localhost:8100'
 };

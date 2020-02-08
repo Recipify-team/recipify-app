@@ -4,7 +4,8 @@ import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
-
+import { AuthService } from './services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,9 @@ export class AppComponent {
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
-    private screenOrientation: ScreenOrientation
+    private screenOrientation: ScreenOrientation,
+    private authService: AuthService,
+    private router: Router
   ) {
     this.initializeApp();
   }
@@ -28,6 +31,14 @@ export class AppComponent {
       this.statusBar.backgroundColorByHexString('#ffffff');
 
       this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
+      this.authService.authenticationState.subscribe(state => {
+        console.log(state)
+        // if (state) {
+        //   this.router.navigate(['inside']);
+        // } else {
+        //   this.router.navigate(['home']);
+        // }
+      });
     });
   }
 }

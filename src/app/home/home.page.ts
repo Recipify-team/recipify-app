@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 
 import { RecipeService } from './../api/recipe.service';
-import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
+import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner/ngx';
 import { Storage } from '@ionic/storage';
 
 
@@ -73,7 +73,19 @@ export class HomePage {
 
 	//==============Scan===================
 	scan() {
-		this.barcodeScanner.scan().then(barcodeData => {
+		const options: BarcodeScannerOptions = {
+			preferFrontCamera : false, // iOS and Android
+			showFlipCameraButton : false, // iOS and Android
+			showTorchButton : false, // iOS and Android
+			torchOn: false, // Android, launch with the torch switched on (if available)
+			prompt : "", // Android
+			resultDisplayDuration: 0, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
+			formats : "all", // default: all but PDF_417 and RSS_EXPANDED
+			orientation : "", // Android only (portrait|landscape), default unset so it rotates with the device
+			disableAnimations : false, // iOS
+			disableSuccessBeep: false // iOS and Android
+		};
+		this.barcodeScanner.scan(options).then(barcodeData => {
 			if (!barcodeData.cancelled) {
 				this.loadingCtrl.getTop().then(hasLoading => {
 					if (!hasLoading) {
