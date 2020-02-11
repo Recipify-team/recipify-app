@@ -34,6 +34,7 @@ export class RecipeService {
       .subscribe(data => {
         this.data = data['result'];
       }, err => {
+        this.data = err;
         console.log('JS Call error' + err);
       })
   }

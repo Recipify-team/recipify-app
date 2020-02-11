@@ -6,7 +6,7 @@
 
 <ion-content class="ion-padding">
 
-  <fwf-button (clicked)="scan()"></fwf-button>
+  <fwf-button (clicked)="scantest()"></fwf-button>
 
   <div class="section-header">
     <h2 class="header-title">Scan history</h2>
@@ -17,23 +17,20 @@
     </ul>
   </div>
   <hr>
-
+  
   <div class="product-card-list">
-
-    <div class="product-card" (click)="openDetailsWithState(item)" *ngFor="let item of productsToDisplay">
+    <ion-virtual-scroll [items]="products" approxItemHeight="100px" [headerFn]="myHeaderFn" >
+      <ion-item-divider *virtualHeader="let header;">
+        {{ header }}
+      </ion-item-divider>
+      <div class="product-card" (click)="openDetailsWithState(item)" *virtualItem="let item;">
         <img src="{{ item.image }}" alt="">
         <div class="product-card-body">
           <h3 class="product-card-title">{{ item.name }}</h3>
           <span class="product-card-id">{{ item.id }}</span>
         </div>
-    </div>
-
+      </div>
+    </ion-virtual-scroll>
   </div>
-
-
-  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
-    <ion-infinite-scroll-content class="ispinner" loadingSpinner="crescent">
-    </ion-infinite-scroll-content>
-  </ion-infinite-scroll>
 
 </ion-content>

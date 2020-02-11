@@ -46,7 +46,6 @@ export function jwtOptionsFactory(storage) {
     BarcodeScanner,
     SplashScreen,
     ScreenOrientation,
-
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     HTTP,
   ],

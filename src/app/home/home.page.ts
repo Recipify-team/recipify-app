@@ -1,64 +1,33 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 
 import { RecipeService } from './../api/recipe.service';
 import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner/ngx';
 import { Storage } from '@ionic/storage';
 
+import { LoadingController, ToastController } from '@ionic/angular';
 
-import { Platform, ToastController, LoadingController } from '@ionic/angular';
-import { HTTP } from '@ionic-native/http/ngx';
-
-import { finalize } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
 import { from } from 'rxjs';
 import { NavigationExtras, ActivatedRoute, Router } from '@angular/router';
+
 
 @Component({
 	selector: 'app-home',
 	templateUrl: 'home.page.html',
 	styleUrls: ['home.page.scss'],
 })
+
 export class HomePage {
 
-	num: string;
 	products: Array<Object>;
-	productsToDisplay: Array<Object>;
 	index: number;
 	result: string;
 
 	constructor(private storage: Storage, private barcodeScanner: BarcodeScanner,
-		private recipeService: RecipeService, private route: ActivatedRoute,
-		private router: Router, private loadingCtrl: LoadingController) {
+		private recipeService: RecipeService, private router: Router,
+		private loadingCtrl: LoadingController, public toastController: ToastController) {
 		this.products = [];
-		this.productsToDisplay = [];
 		this.index = 0;
 		this.loadDataFromStorage();
-	}
-
-	loadData(event) {
-		setTimeout(() => {
-			console.log('Done');
-			event.target.complete();
-			this.addMoreItems();
-			// App logic to determine if all data is loaded
-			// and disable the infinite scroll
-			if (this.productsToDisplay.length == 100) {
-				event.target.disabled = true;
-			}
-		}, 800);
-	}
-
-
-	addMoreItems() {
-		console.log('global list size', this.products.length);
-		for (let i = 0; i < 5; ++i) {
-			++this.index;
-			if (this.products[this.index] == null) {
-				--this.index;
-				break;
-			}
-			this.productsToDisplay.push(this.products[this.index]);
-		}
 	}
 
 	openDetailsWithState(product) {
@@ -74,15 +43,15 @@ export class HomePage {
 	//==============Scan===================
 	scan() {
 		const options: BarcodeScannerOptions = {
-			preferFrontCamera : false, // iOS and Android
-			showFlipCameraButton : false, // iOS and Android
-			showTorchButton : false, // iOS and Android
+			preferFrontCamera: false, // iOS and Android
+			showFlipCameraButton: false, // iOS and Android
+			showTorchButton: false, // iOS and Android
 			torchOn: false, // Android, launch with the torch switched on (if available)
-			prompt : "", // Android
+			prompt: "Scan a product.", // Android
 			resultDisplayDuration: 0, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
-			formats : "all", // default: all but PDF_417 and RSS_EXPANDED
-			orientation : "", // Android only (portrait|landscape), default unset so it rotates with the device
-			disableAnimations : false, // iOS
+			formats: "all", // default: all but PDF_417 and RSS_EXPANDED
+			orientation: "", // Android only (portrait|landscape), default unset so it rotates with the device
+			disableAnimations: false, // iOS
 			disableSuccessBeep: false // iOS and Android
 		};
 		this.barcodeScanner.scan(options).then(barcodeData => {
@@ -98,20 +67,34 @@ export class HomePage {
 				});
 
 				from(this.recipeService.getDataNativeHttp(barcodeData.text)).pipe().subscribe(data => {
-					let product = JSON.parse(data.data).data;
-					this.products.unshift(product);
-					this.productsToDisplay.unshift(product);
-					++this.index;
-					this.storage.set('products', this.products);
-					
-					// Redirect
-					this.openDetailsWithState(product);
-
-					this.loadingCtrl.getTop().then(hasLoading => {
-						if (hasLoading) {
-							this.loadingCtrl.dismiss();
+					if (JSON.parse( data.data) !=null) {
+						console.log("INSIDE");
+						let product = JSON.parse(data.data).data;
+						if (product.image.length == 0) {
+							console.log('image not found');
+							product.image = "assets/placeholder/placeholder-img.jpg";
 						}
-					});
+						product.creationdate = new Date();
+						// Add product to list.
+						this.products = [product, ...this.products];
+						++this.index;
+						// Save value in storage
+						this.storage.set('products', this.products);
+						this.loadingCtrl.getTop().then(hasLoading => {
+							if (hasLoading) {
+								this.loadingCtrl.dismiss();
+							}
+						});
+						// Redirect
+						this.openDetailsWithState(product);
+					} else {
+						this.loadingCtrl.getTop().then(hasLoading => {
+							if (hasLoading) {
+								this.loadingCtrl.dismiss();
+							}
+						});
+						this.presentToast();
+					}
 
 				}, err => {
 					console.log('JS Call error' + err);
@@ -122,43 +105,63 @@ export class HomePage {
 		});
 	}
 
+	myHeaderFn(record, recordIndex, records) {
+		var first_current = new Date(record.creationdate);
+		if (recordIndex == 0) {
+			if(first_current.getDate() === new Date().getDate()){
+				return "aujourd'hui";
+			}
+			return first_current;
+		}
+		
+		var first_prev = new Date(records[recordIndex - 1].creationdate);
+		
+		if (!(first_prev.getDate() === first_current.getDate() && first_prev.getMonth() === first_current.getMonth() && first_prev.getFullYear() === first_current.getFullYear())) {
+			return first_current.toLocaleDateString();
+		}
+		return null;
+	}
+
 	loadDataFromStorage() {
 		this.storage.get('products').then((val) => {
 			this.products = val ? val : [];
-			for (let i = 0; i < 5; ++i) {
-				++this.index;
-				if (this.products.length > this.index) {
-					this.productsToDisplay.push(this.products[this.index]);
-				}
-			}
-			console.log(this.products)
 		});
-
 	}
 
 	scantest() {
-		// from(this.recipeService.getDataNativeHttp('061314000070')).pipe(
-		//   finalize(() => console.log("testInsidePipe"))
-		// ).subscribe(data => {
-		//   console.log('native data' + JSON.stringify(data.data));
-		//   this.num = JSON.parse(data.data);
-		//   this.products.unshift(JSON.parse(data.data));
-		//   this.productsToDisplay.unshift(JSON.parse(data.data));
-		//   ++this.index;
-		// }, err => {
-		//   console.log('JS Call error' + err);
-		// })
-		this.num = '565464';
-		this.products.unshift(this.num);
-		this.productsToDisplay.unshift(this.num);
-		++this.index;
+		let testproduct = { name: "test", image: "", id: 5161, creationdate: new Date() };
+		if (testproduct.image.length == 0) {
+			console.log('image not found');
+			testproduct.image = "assets/placeholder/placeholder-img.jpg";
+		}
+		if (testproduct.name.length == 0) {
+			this.presentToast();
+		} else {
+			this.products = [testproduct, ...this.products];
+
+			++this.index;
+		}
 	}
 
 	clear() {
 		this.products = [];
-		this.productsToDisplay = [];
 		this.storage.clear();
 		console.log("db_clear");
+	}
+	async presentToast() {
+		const toast = await this.toastController.create({
+			message: 'Product not found.',
+			position: 'top',
+			color: 'danger',
+			duration: 2000,
+			buttons: [
+				{
+					side: 'start',
+					icon: 'close',
+				}
+			]
+		});
+		toast.present();
 	}
 }
 

@@ -1,3 +1,7 @@
+.product-card-list{
+	margin-bottom: 100px;
+}
+
 .product-card {
 	border-radius: 5px;
 	box-shadow: 0 10px 30px -5px rgba(#000000, 0.2);
@@ -40,4 +44,12 @@
 		font-size: 0.9em;
 		opacity: 0.7;
 	}
+}
+
+ion-virtual-scroll {
+	contain: none !important;
+}
+
+ion-virtual-scroll>.virtual-item{
+	background-color: transparent;
 }
