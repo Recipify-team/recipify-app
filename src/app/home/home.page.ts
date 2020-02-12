@@ -7,7 +7,13 @@ import { Storage } from '@ionic/storage';
 import { LoadingController, ToastController } from '@ionic/angular';
 
 import { from } from 'rxjs';
-import { NavigationExtras, ActivatedRoute, Router } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
+
+import TimeAgo from 'javascript-time-ago'
+ 
+// Load locale-specific relative date/time formatting rules.
+import en from 'javascript-time-ago/locale/en'
+import fr from 'javascript-time-ago/locale/fr'
 
 
 @Component({
@@ -67,12 +73,15 @@ export class HomePage {
 				});
 
 				from(this.recipeService.getDataNativeHttp(barcodeData.text)).pipe().subscribe(data => {
-					if (JSON.parse( data.data) !=null) {
-						console.log("INSIDE");
+					if (JSON.parse(data.data) != null) {
 						let product = JSON.parse(data.data).data;
-						if (product.image.length == 0) {
+						if (!product.hasOwnProperty('image')) {
 							console.log('image not found');
-							product.image = "assets/placeholder/placeholder-img.jpg";
+							product['image'] = "assets/placeholder/placeholder-img.jpg";
+						}
+						if (product.name.length == 0) {
+							console.log('name not found');
+							product.name = "Sans nom";
 						}
 						product.creationdate = new Date();
 						// Add product to list.
@@ -107,18 +116,30 @@ export class HomePage {
 
 	myHeaderFn(record, recordIndex, records) {
 		var first_current = new Date(record.creationdate);
+
+		TimeAgo.addLocale(fr)
+		const timeAgo = new TimeAgo('fr-FR')
+		
 		if (recordIndex == 0) {
-			if(first_current.getDate() === new Date().getDate()){
+			if (first_current.getDate() === new Date().getDate()) {
 				return "aujourd'hui";
 			}
-			return first_current;
+			if(new Date().getMonth() == first_current.getMonth()){
+				return timeAgo.format(first_current.getTime() - 24 * 60 * 60 * 1000);
+			}else{
+				return timeAgo.format(first_current.getTime() - 365 * 24 * 60 * 60 * 1000, 'twitter');
+			}
 		}
-		
+
 		var first_prev = new Date(records[recordIndex - 1].creationdate);
+		if(new Date().getMonth() != first_current.getMonth()){
+			return timeAgo.format(first_current.getTime() - 365 * 24 * 60 * 60 * 1000, 'twitter');
+		}
 		
 		if (!(first_prev.getDate() === first_current.getDate() && first_prev.getMonth() === first_current.getMonth() && first_prev.getFullYear() === first_current.getFullYear())) {
-			return first_current.toLocaleDateString();
+			return timeAgo.format(first_current.getTime() - 24 * 60 * 60 * 1000);
 		}
+		
 		return null;
 	}
 
@@ -129,10 +150,10 @@ export class HomePage {
 	}
 
 	scantest() {
-		let testproduct = { name: "test", image: "", id: 5161, creationdate: new Date() };
-		if (testproduct.image.length == 0) {
+		let testproduct = { name: "test",  id: 5161, creationdate: new Date() };
+		if (!testproduct.hasOwnProperty('image')) {
 			console.log('image not found');
-			testproduct.image = "assets/placeholder/placeholder-img.jpg";
+			testproduct['image'] = "assets/placeholder/placeholder-img.jpg";
 		}
 		if (testproduct.name.length == 0) {
 			this.presentToast();
@@ -158,6 +179,10 @@ export class HomePage {
 				{
 					side: 'start',
 					icon: 'close',
+					role: 'cancel',
+					handler: () => {
+						console.log('Cancel clicked');
+					}
 				}
 			]
 		});
