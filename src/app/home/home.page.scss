@@ -57,3 +57,8 @@ ion-virtual-scroll {
 ion-virtual-scroll>.virtual-item{
 	background-color: transparent;
 }
+
+ion-item-divider {
+	margin: 15px 0 0 0;
+	z-index: 0;
+}
