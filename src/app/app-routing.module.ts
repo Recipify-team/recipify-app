@@ -29,7 +29,11 @@ const routes: Routes = [
     path: 'inside',
     loadChildren: () => import('./pages/inside/inside.module').then( m => m.InsidePageModule),
     canActivate: [AuthGuardService]
+  },  {
+    path: 'favorite',
+    loadChildren: () => import('./pages/favorite/favorite.module').then( m => m.FavoritePageModule)
   },
+
 
 ];
 

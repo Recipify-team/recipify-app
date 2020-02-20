@@ -1,36 +1,53 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Recipify</ion-title>
-  </ion-toolbar>
+	<ion-toolbar>
+		<ion-title>Recipify</ion-title>
+	</ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
 
-  <div class="section-header">
-    <h2 class="header-title">Scan history</h2>
-    <ul class="header-actions">
-      <li (click)="clear()">
-        <ion-icon name="md-trash"></ion-icon>
-      </li>
-    </ul>
-  </div>
-  <hr>
-  
-  <div class="product-card-list">
-    <ion-virtual-scroll [items]="products" approxItemHeight="100px" [headerFn]="myHeaderFn" >
-      <ion-item-divider *virtualHeader="let header;">
-        {{ header }}
-      </ion-item-divider>
-      <div class="product-card" (click)="openDetailsWithState(item)" *virtualItem="let item;">
-        <img src="{{ item.image }}" alt="">
-        <div class="product-card-body">
-          <h3 class="product-card-title">{{ item.name }}</h3>
-          <span class="product-card-id">{{ item.id }}</span>
-        </div>
-      </div>
-    </ion-virtual-scroll>
-  </div>
+	<div class="section-header">
+		<h2 class="header-title">Scan history</h2>
+		<ul class="header-actions">
+			<li>
+				<ion-icon name="star-outline" (tap)="RedirectToFavoritePage()"></ion-icon>
+			</li>
+		</ul>
+	</div>
+	<hr>
 
-  <fwf-button (clicked)="scan()"></fwf-button>
+	<ion-list class="product-card-list">
+
+		<div *ngFor="let item of productsToDisplay; index as i;">
+			<div *ngIf="myHeaderFn(i,item,productsToDisplay)!=null">
+				<ion-item-divider>{{myHeaderFn(i,item,productsToDisplay)}}</ion-item-divider>
+			</div>
+			<ion-item class="product-card" (press)="onPressitem(item)" (click)="openDetailsWithState(item)"
+				lines="none">
+
+				<img src="{{ item.image }}" alt="">
+				<div class="product-card-body">
+					<h3 class="product-card-title">{{ item.name }}</h3>
+					<span class="product-card-id">{{ item.id }}</span>
+				</div>
+				<div *ngIf="!ishidden">
+					<ion-checkbox slot="end" [(ngModel)]="item.isChecked"></ion-checkbox>
+				</div>
+			</ion-item>
+		</div>
+
+	</ion-list>
+	<ion-infinite-scroll threshold="100px" (ionInfinite)="DisplayMoreProducts($event)">
+		<ion-infinite-scroll-content loadingSpinner="Crescent">
+		</ion-infinite-scroll-content>
+	</ion-infinite-scroll>
+
+	<fwf-button (clicked)="scan()"></fwf-button>
+
+		<ion-fab *ngIf="!ishidden" vertical="bottom" horizontal="end" slot="fixed" >
+			<ion-fab-button (click)="removeItem(productsToDisplay)" color="danger">
+				<ion-icon name="arrow-forward-circle"></ion-icon>
+			</ion-fab-button>
+		</ion-fab>
 
 </ion-content>

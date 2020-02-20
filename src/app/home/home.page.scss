@@ -50,15 +50,20 @@
 	}
 }
 
-ion-virtual-scroll {
+ion-list {
 	contain: none !important;
 }
 
-ion-virtual-scroll>.virtual-item{
+ion-list>.virtual-item{
 	background-color: transparent;
 }
 
 ion-item-divider {
 	margin: 15px 0 10px 0;
 	z-index: 0;
+}
+
+ion-item{
+    --inner-padding-end: 0px;
+    --padding-start:0px
 }

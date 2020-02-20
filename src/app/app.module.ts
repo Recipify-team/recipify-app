@@ -18,6 +18,7 @@ import { HTTP } from '@ionic-native/http/ngx';
 
 import { JwtModule, JWT_OPTIONS } from '@auth0/angular-jwt'
 import{AuthGuardService}from './services/auth-guard.service'
+import { HAMMER_GESTURE_CONFIG, HammerGestureConfig } from '@angular/platform-browser';
 
 export function jwtOptionsFactory(storage) {
   return {
@@ -26,6 +27,19 @@ export function jwtOptionsFactory(storage) {
     },
     whitelistedDomains: ['localhost:8100']
   }
+}
+export class HammerConfig extends HammerGestureConfig {
+  overrides = {
+      pan: {
+          direction: 6
+      },
+      pinch: {
+          enable: false
+      },
+      rotate: {
+          enable: false
+      }
+  };
 }
 
 @NgModule({
@@ -48,6 +62,10 @@ export function jwtOptionsFactory(storage) {
     ScreenOrientation,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     HTTP,
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: HammerConfig
+  },
   ],
   bootstrap: [AppComponent]
 })
