@@ -14,13 +14,13 @@
 </ion-content> -->
 
 <ion-content>
-  <img class="product-image" src="{{data.image}}" alt="">
+  <img class="product-image" src="{{dataProduct.image}}" alt="">
   <div class="ion-padding">
     <div class="product-container">
       <header>
-        <span class="product-code">{{data.id}}</span>
-        <h2 class="product-name">{{data.name}}</h2>
-        <span class="product-brand">{{data.brand}}</span>
+        <span class="product-code">{{dataProduct.id}}</span>
+        <h2 class="product-name">{{dataProduct.name}}</h2>
+        <span class="product-brand">{{dataProduct.brand}}</span>
       </header>
       <main>
         <br>
@@ -28,30 +28,26 @@
           <h3 class="header-title">Recipes</h3>
         </div>
         <hr>
-        <div class="recipe-card-list">
+        <div *ngIf="recipes.length > 0; else elseBlock" class="recipe-card-list">
 
-          <div class="recipe-card" (click)="openRecipeWithState(data)" >
-            <img src="https://static.openfoodfacts.org/images/products/006/131/400/0070/front_fr.3.400.jpg" alt="">
+          <ion-list class="recipe-card"  (click)="openRecipeWithState(recipe)" *ngFor="let recipe of recipes">
+            <img src={{recipe.image}} alt="">
             <div class="recipe-card-body">
-              <h3 class="recipe-card-title">Recipe test</h3>
+              <h3 class="recipe-card-title">{{recipe.title}}</h3>
             </div>
-          </div>
-
-          <div class="recipe-card" (click)="openRecipeWithState(data)">
-            <img src="https://static.openfoodfacts.org/images/products/006/131/400/0070/front_fr.3.400.jpg" alt="">
-            <div class="recipe-card-body">
-              <h3 class="recipe-card-title">Recipe test</h3>
-            </div>
-          </div>
-
-          <div class="recipe-card" (click)="openRecipeWithState(data)">
-            <img src="https://static.openfoodfacts.org/images/products/006/131/400/0070/front_fr.3.400.jpg" alt="">
-            <div class="recipe-card-body">
-              <h3 class="recipe-card-title">Recipe test</h3>
-            </div>
-          </div>
-
+          </ion-list>
+          <ion-infinite-scroll threshold="100px" (ionInfinite)="AddRecipe($event)">
+            <ion-infinite-scroll-content
+              loadingSpinner="bubbles"
+              loadingText="Loading more data...">
+            </ion-infinite-scroll-content>
+          </ion-infinite-scroll>
         </div>
+        
+        <ng-template #elseBlock>
+          <p>Aucune recette n’a été trouvée pour ce produit.</p>
+        </ng-template>
+          
       </main>
     </div>
   </div>

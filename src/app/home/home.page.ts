@@ -9,10 +9,7 @@ import { LoadingController, ToastController } from '@ionic/angular';
 import { from } from 'rxjs';
 import { NavigationExtras, Router } from '@angular/router';
 
-
-import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en'
-import fr from 'javascript-time-ago/locale/fr'
+import { HeaderService } from '../services/header.service';
 
 
 
@@ -32,17 +29,17 @@ export class HomePage {
 
 	constructor(private storage: Storage, private barcodeScanner: BarcodeScanner,
 		private recipeService: RecipeService, private router: Router,
-		private loadingCtrl: LoadingController, public toastController: ToastController) {
+		private loadingCtrl: LoadingController, public toastController: ToastController,
+		private headerService: HeaderService) {
 		this.products = [];
 		this.productsToDisplay = [];
 		this.index = 0;
 		this.ishidden = true;
-		this.loadDataFromStorage();
 		this.init();
 	}
 
-
 	init() {
+		this.loadDataFromStorage();
 		document.addEventListener('backbutton', function (event) {
 			if (this.ishidden == false) {
 				this.ishidden = true;
@@ -55,6 +52,10 @@ export class HomePage {
 		}.bind(this), false);
 	}
 
+	getProductHeader(index, product, products) {
+		return this.headerService.setHeaderByDate(index, product, products);
+	}
+
 	onPressitem(product) {
 		console.log("onPressitem");
 		if (product.isChecked == false) {
@@ -64,7 +65,6 @@ export class HomePage {
 		}
 		this.ishidden = false;
 	}
-
 
 	openDetailsWithState(product) {
 		console.log("can't open: " + product.isChecked);
@@ -82,43 +82,13 @@ export class HomePage {
 		if (this.ishidden != false) {
 			let navigationExtras: NavigationExtras = {
 				state: {
-					// product: product
+					// recipe: recipe
 				}
 			}
 			this.router.navigate(['favorite'], navigationExtras);
 		}
 	}
 
-
-
-	// Function to set the headers
-	myHeaderFn(index, product, products) {
-		var first_current = new Date(product.creationdate);
-
-		TimeAgo.addLocale(fr)
-		const timeAgo = new TimeAgo('fr-FR')
-
-		if (index == 0) {
-			if (first_current.getDate() === new Date().getDate()) {
-				return "aujourd'hui";
-			}
-			if (new Date().getMonth() == first_current.getMonth()) {
-				return timeAgo.format(first_current.getTime() - 24 * 60 * 60 * 1000);
-			} else {
-				return timeAgo.format(first_current.getTime() - 365 * 24 * 60 * 60 * 1000, 'twitter');
-			}
-		}
-
-		var first_prev = new Date(products[index - 1].creationdate);
-		if (new Date().getMonth() != first_current.getMonth()) {
-			return timeAgo.format(first_current.getTime() - 365 * 24 * 60 * 60 * 1000, 'twitter');
-		}
-
-		if (!(first_prev.getDate() === first_current.getDate() && first_prev.getMonth() === first_current.getMonth() && first_prev.getFullYear() === first_current.getFullYear())) {
-			return timeAgo.format(first_current.getTime() - 24 * 60 * 60 * 1000);
-		}
-		return null;
-	}
 	// Load data for infiniteScroll
 	DisplayMoreProducts(event) {
 		setTimeout(() => {
@@ -126,12 +96,12 @@ export class HomePage {
 			event.target.complete();
 			// Will add 5 elements to the displyed list
 			for (let i = 0; i < 5; ++i) {
-				++this.index;
 				if (this.products[this.index] == null) {
-					--this.index;
 					break;
+				} else {
+					this.productsToDisplay.push(this.products[this.index]);
+					++this.index;
 				}
-				this.productsToDisplay.push(this.products[this.index]);
 			}
 			// App logic to determine if all data is loaded
 			// and disable the infinite scroll
@@ -145,13 +115,14 @@ export class HomePage {
 		this.storage.get('products').then((val) => {
 			this.products = val ? val : [];
 			for (let i = 0; i < 5; ++i) {
-				++this.index;
 				if (this.products.length > this.index) {
 					this.productsToDisplay.push(this.products[this.index]);
+					++this.index;
 				}
 			}
 		});
 	}
+
 	//==============Scan===================
 	scan() {
 		const options: BarcodeScannerOptions = {
@@ -178,7 +149,7 @@ export class HomePage {
 					}
 				});
 
-				from(this.recipeService.getDataNativeHttp(barcodeData.text)).pipe().subscribe(data => {
+				from(this.recipeService.getProductData(barcodeData.text)).pipe().subscribe(data => {
 					if (JSON.parse(data.data) != null) {
 						let product = JSON.parse(data.data).data;
 						product['isChecked'] = false;
@@ -191,10 +162,12 @@ export class HomePage {
 							product.name = "Sans nom";
 						}
 						product.creationdate = new Date();
+
 						// Add product to list.
 						this.products.unshift(product);
 						this.productsToDisplay.unshift(product);
 						++this.index;
+
 						// Save value in storage
 						this.storage.set('products', this.products);
 						this.loadingCtrl.getTop().then(hasLoading => {
@@ -202,6 +175,7 @@ export class HomePage {
 								this.loadingCtrl.dismiss();
 							}
 						});
+						
 						// Redirect
 						this.openDetailsWithState(product);
 					} else {
@@ -249,21 +223,24 @@ export class HomePage {
 				const index = this.products.indexOf(this.deepIndexOf(this.products, this.productsToDisplay[i]));
 				if (index > -1) {
 					this.products.splice(index, 1);
-
+					this.productsToDisplay.splice(i, 1);
+					++this.index;
 				}
-				this.productsToDisplay.splice(i, 1);
+
 			}
 
 		}
 		this.storage.set('products', this.products);
 		this.ishidden = true;
 	}
+
 	clear() {
 		this.products = [];
 		this.productsToDisplay = [];
 		this.storage.clear();
 		console.log("db_clear");
 	}
+
 	async presentToast() {
 		const toast = await this.toastController.create({
 			message: 'Product not found.',

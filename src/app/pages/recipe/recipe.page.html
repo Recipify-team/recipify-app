@@ -5,12 +5,12 @@
 </ion-header>
 
 <ion-content>
-  <img class="recipe-image" src="https://www.themealdb.com/images/media/meals/wyxwsp1486979827.jpg" alt="">
+  <img class="recipe-image" src="{{data.image}}" alt="">
   <div class="ion-padding">
     <div class="recipe-container">
       <header>
-        <h2 class="recipe-name">Chicken and rice</h2>
-        <span class="recipe-source"><a href="#">View source</a></span>
+        <h2 class="recipe-name">{{data.title}}</h2>
+        <span class="recipe-source"><a href="{{data.link}}">View source</a></span>
       </header>
       <main>
         <br>
@@ -19,8 +19,7 @@
         </div>
         <hr>
         <ul class="ingredient-list">
-          <li class="ingredient-item">Chiken</li>
-          <li class="ingredient-item">Rice</li>
+          <li class="ingredient-item" *ngFor="let ingredient of data.ingredients">{{ingredient}}</li>
         </ul>
 
         <div class="section-header">
@@ -28,9 +27,14 @@
         </div>
         <hr>
         <p class="recipe-instructions">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Error ipsum amet impedit ipsa dolorum accusamus unde
-          perferendis rem, eaque ea quaerat similique veritatis. Amet animi hic ipsa odit rem cupiditate?
+          <li *ngFor="let instruction of data.instructions">{{instruction}}</li>
         </p>
+        <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+          <ion-fab-button (click)="addOrRemoveToFavorite()" color="warning">
+            <ion-icon *ngIf="isFavorite; else elseBlock" name="star"></ion-icon>
+            <ng-template #elseBlock><ion-icon name="star-outline"></ion-icon></ng-template>
+          </ion-fab-button>
+        </ion-fab>
       </main>
     </div>
   </div>
