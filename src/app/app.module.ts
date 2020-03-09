@@ -17,8 +17,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP } from '@ionic-native/http/ngx';
 
 import { JwtModule, JWT_OPTIONS } from '@auth0/angular-jwt'
-import{AuthGuardService}from './services/auth-guard.service'
+import { AuthGuardService } from './services/auth-guard.service'
 import { HAMMER_GESTURE_CONFIG, HammerGestureConfig } from '@angular/platform-browser';
+import { SuperTabsModule } from '@ionic-super-tabs/angular';
+
 
 export function jwtOptionsFactory(storage) {
   return {
@@ -45,7 +47,10 @@ export class HammerConfig extends HammerGestureConfig {
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, IonicModule.forRoot(), IonicStorageModule.forRoot(),
+  imports: [BrowserModule,
+    IonicModule.forRoot(),
+    IonicStorageModule.forRoot(),
+    SuperTabsModule.forRoot(),
     AppRoutingModule, HttpClientModule,
     JwtModule.forRoot({
       jwtOptionsProvider: {

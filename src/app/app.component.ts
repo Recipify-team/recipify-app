@@ -6,7 +6,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 import { AuthService } from './services/auth.service';
 import { Router } from '@angular/router';
-
+import { Storage } from '@ionic/storage';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -19,7 +19,8 @@ export class AppComponent {
     private statusBar: StatusBar,
     private screenOrientation: ScreenOrientation,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private storage: Storage
   ) {
     this.initializeApp();
   }
@@ -28,11 +29,17 @@ export class AppComponent {
     this.platform.ready().then(() => {
       this.splashScreen.hide();
       this.statusBar.styleDefault();
-      this.statusBar.backgroundColorByHexString('#ffffff');
-
+      this.statusBar.styleBlackOpaque();
+      //this.statusBar.backgroundColorByHexString('#10dc60');
       this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
+     
+      this.storage.get('tutorialDone').then((val) => {
+        if(!(val==true)){
+          //TO CHANEG this.router.navigate(['tutorial']);
+        }
+      });
       this.authService.authenticationState.subscribe(state => {
-        console.log(state)
+        //console.log(state)
         // if (state) {
         //   this.router.navigate(['inside']);
         // } else {

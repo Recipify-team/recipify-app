@@ -1,54 +1,73 @@
-<ion-header>
-	<ion-toolbar>
-		<ion-title>Recipify</ion-title>
-	</ion-toolbar>
-</ion-header>
+<super-tabs [config]="config" (tabChange)="onTabChange($event)"  [activeTabIndex]="activeTab">
+	<super-tabs-toolbar slot="top" color="success">
+		<super-tab-button>
+			<ion-icon name="qr-scanner"></ion-icon>
+		</super-tab-button>
+		<super-tab-button>
+			<ion-icon name="star-outline"></ion-icon>
+		</super-tab-button>
+		<super-tab-button>
+			<ion-icon name="journal"></ion-icon>
+		</super-tab-button>
+		<!-- <button><ion-icon name="more"></ion-icon></button> -->
+		
+	</super-tabs-toolbar>
+	<super-tabs-container>
+		<super-tab>
+			<ion-content class="ion-padding">
+				<div class="section-header">
+					<h2 class="header-title">Scan history</h2>
+				</div>
+				<hr>
+				<ion-list *ngIf="productsToDisplay.length > 0; else elseBlock" class="product-card-list">
 
-<ion-content class="ion-padding">
+					<div *ngFor="let product of productsToDisplay; index as i;">
+						<div *ngIf="getProductHeader(i,product,products)!=null">
+							<ion-item-divider>{{getProductHeader(i,product,productsToDisplay)}}</ion-item-divider>
+						</div>
+						<ion-item class="product-card" (press)="onPressitem(product)"
+							(click)="openDetailsWithState(product)" lines="none">
+							<img src="{{ product.image }}" alt="">
+							<div class="product-card-body">
+								<h3 class="product-card-title">{{ product.name }}</h3>
+								<span class="product-card-id">{{ product.id }}</span>
+							</div>
+							<div *ngIf="!ishidden">
+								<ion-checkbox slot="end" [(ngModel)]="product.isChecked"></ion-checkbox>
+							</div>
+						</ion-item>
+					</div>
 
-	<div class="section-header">
-		<h2 class="header-title">Scan history</h2>
-		<ul class="header-actions">
-			<li (tap)="RedirectToFavoritePage()">
-				<ion-icon name="star-outline"></ion-icon>
-			</li>
-		</ul>
-	</div>
-	<hr>
-	<ion-list *ngIf="productsToDisplay.length > 0; else elseBlock" class="product-card-list">
+				</ion-list>
+				<ng-template #elseBlock>
+					<p>Vous pouvez scanner un produit en appuyant sur le bouton en dessous.</p>
+				</ng-template>
+				<ion-infinite-scroll threshold="100px" (ionInfinite)="DisplayMoreProducts($event)">
+					<ion-infinite-scroll-content loadingSpinner="Crescent">
+					</ion-infinite-scroll-content>
+				</ion-infinite-scroll>
 
-		<div *ngFor="let product of productsToDisplay; index as i;">
-			<div *ngIf="getProductHeader(i,product,products)!=null">
-				<ion-item-divider>{{getProductHeader(i,product,productsToDisplay)}}</ion-item-divider>
+				<ion-fab *ngIf="!ishidden" vertical="bottom" horizontal="end" slot="fixed">
+					<ion-fab-button (click)="removeItem(productsToDisplay)" color="danger" activated=true>
+						<ion-icon name="arrow-forward-circle"></ion-icon>
+					</ion-fab-button>
+				</ion-fab>
+
+				<fwf-button (clicked)="scan()"></fwf-button>
+			</ion-content>
+		</super-tab>
+		<super-tab>
+			<ion-nav [root]="favoritePage" [rootParams]="{ hello: 'world' }"></ion-nav>
+		</super-tab>
+		<super-tab>
+			<ion-content class="ion-padding">
+			<div class="section-header">
+				<h2 class="header-title">Shopping list</h2>
 			</div>
-			<ion-item class="product-card" (press)="onPressitem(product)" (click)="openDetailsWithState(product)"
-				lines="none">
-				<img src="{{ product.image }}" alt="">
-				<div class="product-card-body">
-					<h3 class="product-card-title">{{ product.name }}</h3>
-					<span class="product-card-id">{{ product.id }}</span>
-				</div>
-				<div *ngIf="!ishidden">
-					<ion-checkbox slot="end" [(ngModel)]="product.isChecked"></ion-checkbox>
-				</div>
-			</ion-item>
-		</div>
+			<hr>
+		</ion-content>
+			<!-- <ion-nav [root]="favoritePage" [rootParams]="{ hello: 'world' }"></ion-nav> -->
+		</super-tab>
 
-	</ion-list>
-	<ng-template #elseBlock>
-		<p>Vous pouvez scanner un produit en appuyant sur le bouton en dessous.</p>
-	</ng-template>
-	<ion-infinite-scroll threshold="100px" (ionInfinite)="DisplayMoreProducts($event)">
-		<ion-infinite-scroll-content loadingSpinner="Crescent">
-		</ion-infinite-scroll-content>
-	</ion-infinite-scroll>
-
-	<ion-fab *ngIf="!ishidden" vertical="bottom" horizontal="end" slot="fixed">
-		<ion-fab-button (click)="removeItem(productsToDisplay)" color="danger" activated=true>
-			<ion-icon name="arrow-forward-circle" ></ion-icon>
-		</ion-fab-button>
-	</ion-fab>
-
-	<fwf-button (clicked)="scan()"></fwf-button>
-
-</ion-content>
+	</super-tabs-container>
+</super-tabs>

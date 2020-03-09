@@ -23,16 +23,26 @@ export class FavoritePage implements OnInit {
 		this.ishidden = true;
 	}
 
-
 	ngOnInit() {
 
 	}
 
 	ionViewWillEnter() {
 		this.loadDataFromStorage();
+		document.addEventListener('backbutton', function (event) {
+			if (this.ishidden == false) {
+				this.ishidden = true;
+				for (let i = 0; i < this.productsToDisplay.length; ++i) {
+					this.displayedFavRecipe[i].isChecked = false;
+				};
+				event.preventDefault();
+				event.stopPropagation();
+			}
+		}.bind(this), false);
 	}
 
 	loadDataFromStorage() {
+		console.log("have to load.")
 		this.storage.get('favorites').then((val) => {
 			this.favRecipes = val ? val : [];
 			this.displayedFavRecipe = this.favRecipes.slice(0, 4);
@@ -44,16 +54,18 @@ export class FavoritePage implements OnInit {
 	}
 
 	openRecipeWithState(recipe) {
-		let navigationExtras: NavigationExtras = {
-			state: {
-				recipe: recipe
+		if (this.ishidden != false) {
+			let navigationExtras: NavigationExtras = {
+				state: {
+					recipe: recipe
+				}
 			}
+			this.router.navigate(['recipe'], navigationExtras);
 		}
-		this.router.navigate(['recipe'], navigationExtras);
 	}
-
+	
 	onPressitem(recipe) {
-		console.log("onPressitem");
+
 		if (recipe.isChecked == false) {
 			recipe.isChecked = true;
 		} else {

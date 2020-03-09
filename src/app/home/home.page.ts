@@ -1,15 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 
 import { RecipeService } from './../api/recipe.service';
 import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner/ngx';
 import { Storage } from '@ionic/storage';
 
-import { LoadingController, ToastController } from '@ionic/angular';
+import { LoadingController, ToastController, NavController, NavParams } from '@ionic/angular';
 
 import { from } from 'rxjs';
 import { NavigationExtras, Router } from '@angular/router';
 
 import { HeaderService } from '../services/header.service';
+import { SuperTabsModule, SuperTabs } from '@ionic-super-tabs/angular';
+import { SuperTabsConfig } from '@ionic-super-tabs/core';
+import {FavoritePage} from './../pages/favorite/favorite.page';
 
 
 
@@ -27,6 +30,19 @@ export class HomePage {
 	result: string;
 	ishidden: boolean;
 
+	favoritePage: any = FavoritePage;
+	activeTab = 0;
+	config: SuperTabsConfig = {
+		dragThreshold: 0,
+		allowElementScroll: false,
+		maxDragAngle: 20,
+		sideMenuThreshold: 50,//50
+		transitionDuration: 150,
+		shortSwipeDuration: 300,
+		debug: false,
+		avoidElements: false,
+	  };
+	  @ViewChild(SuperTabs, { static: false }) superTabs: SuperTabs;
 	constructor(private storage: Storage, private barcodeScanner: BarcodeScanner,
 		private recipeService: RecipeService, private router: Router,
 		private loadingCtrl: LoadingController, public toastController: ToastController,
@@ -38,6 +54,12 @@ export class HomePage {
 		this.init();
 	}
 
+	onTabChange(){
+		console.log(this.superTabs.activeTabIndex);
+	}
+	ionViewWillEnter() {
+		this.favoritePage.loadDataFromStorage();
+	}
 	init() {
 		this.loadDataFromStorage();
 		document.addEventListener('backbutton', function (event) {
@@ -67,7 +89,6 @@ export class HomePage {
 	}
 
 	openDetailsWithState(product) {
-		console.log("can't open: " + product.isChecked);
 		if (this.ishidden != false) {
 			let navigationExtras: NavigationExtras = {
 				state: {
@@ -78,21 +99,9 @@ export class HomePage {
 		}
 	}
 
-	RedirectToFavoritePage() {
-		if (this.ishidden != false) {
-			let navigationExtras: NavigationExtras = {
-				state: {
-					// recipe: recipe
-				}
-			}
-			this.router.navigate(['favorite'], navigationExtras);
-		}
-	}
-
 	// Load data for infiniteScroll
 	DisplayMoreProducts(event) {
 		setTimeout(() => {
-			console.log('Done');
 			event.target.complete();
 			// Will add 5 elements to the displyed list
 			for (let i = 0; i < 5; ++i) {
@@ -218,7 +227,6 @@ export class HomePage {
 
 	removeItem(productsDisplayed) {
 		for (let i = 0; i < productsDisplayed.length; ++i) {
-			console.log("product is checked: " + productsDisplayed[i].isChecked);
 			if (productsDisplayed[i].isChecked == true) {
 				const index = this.products.indexOf(this.deepIndexOf(this.products, this.productsToDisplay[i]));
 				if (index > -1) {
@@ -226,9 +234,7 @@ export class HomePage {
 					this.productsToDisplay.splice(i, 1);
 					++this.index;
 				}
-
 			}
-
 		}
 		this.storage.set('products', this.products);
 		this.ishidden = true;
